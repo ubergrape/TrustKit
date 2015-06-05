@@ -98,11 +98,17 @@
 						<h2 class="subtitle subtitle-overview">Overview</h2>
 						<p><code>TSKPinVerifier</code> is a class for manually verifying a server&rsquo;s identity against the global SSL pinning policy.</p>
 
-<p>This method should only be used to validate certificate chains for SSL connections that are not automatically handled by <a href="../Classes/TrustKit.html">TrustKit</a>:</p>
+<p><code>TSKPinVerifier</code> should only be used for SSL connections that are not automatically handled by <a href="../Classes/TrustKit.html">TrustKit</a>. The server&rsquo;s trust object, which contains its certificate chain, needs to be retrieved or built before being passed to <code>TSKPinVerifier</code> for validation. The following APIs are not automatically handled by <a href="../Classes/TrustKit.html">TrustKit</a> and require manual validation:</p>
 
 <ul>
-<li>Background upload/download URL sessions, because they are performed in a different process where <a href="../Classes/TrustKit.html">TrustKit</a> doesn&rsquo;t get loaded.</li>
-<li>Connections that rely on a third-party library for SSL (such as OpenSSL) instead of Apple&rsquo;s SecureTransport.</li>
+<li>Connections initiated outside of the App&rsquo;s process, where <a href="../Classes/TrustKit.html">TrustKit</a> does not get loaded:
+
+<ul>
+<li> <code>WKWebView</code> connections: the server&rsquo;s trust object can be retrieved within the <code>webView:didReceiveAuthenticationChallenge:completionHandler:</code> method.</li>
+<li> <code>NSURLSession</code> connections using a background session: the server&rsquo;s trust object can be retrieved within the <code>application:handleEventsForBackgroundURLSession:completionHandler:</code> method.</li>
+</ul>
+</li>
+<li>Connections initiated using a third-party SSL library such as OpenSSL, instead of Apple&rsquo;s SecureTransport. A <code>SecTrustRef</code> object needs to be built using the server&rsquo;s certificate chain.</li>
 </ul>
 
 					</div>
