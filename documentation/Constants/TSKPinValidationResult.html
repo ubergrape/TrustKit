@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<title>TSKPinValidationResult Constants Reference</title>
+
+	<link rel="stylesheet" href="../css/style.css">
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1.4">
+	<meta name="generator" content="appledoc 2.2.1 (build 1333)">
+</head>
+<body class="appledoc">
+	<header>
+		<div class="container" class="hide-in-xcode">
+			
+			<h1 id="library-title">
+				<a href="../index.html">TrustKit </a>
+			</h1>
+
+			<p id="developer-home">
+				<a href="../index.html">TrustKit</a>
+			</p>
+			
+		</div>
+	</header>
+
+	<aside>
+		<div class="container">
+			<nav>
+				<ul id="header-buttons" role="toolbar">
+					<li><a href="../index.html">Index</a></li>
+<li><a href="../hierarchy.html">Hierarchy</a></li>
+
+					<li id="on-this-page" role="navigation">
+						<label>
+							On This Page
+
+							<div class="chevron">
+								<div class="chevy chevron-left"></div>
+								<div class="chevy chevron-right"></div>
+							</div>
+
+							<select id="jump-to">
+	<option value="top">Jump To&#133;</option>
+	
+
+	
+
+	
+</select>
+						</label>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</aside>
+
+	<article>
+		<div id="overview_contents" class="container">
+			<div id="content">
+				<main role="main">
+					<h1 class="title">TSKPinValidationResult Constants Reference</h1>
+
+					
+					<div class="section section-specification"><table cellspacing="0"><tbody>
+						<tr>
+	<th>Declared in</th>
+	<td>TSKPinVerifier.h</td>
+</tr>
+						</tbody></table></div>
+					
+
+                    
+
+					
+
+                    
+                    <h3 class="subsubtitle method-title">TSKPinValidationResult</h3>
+                    
+					
+					<div class="section section-overview">
+                        <p>Possible return values when verifying a server&rsquo;s identity against the global SSL pinning policy using <a href="../Classes/TSKPinVerifier.html"><code>TSKPinVerifier</code></a>.</p>
+					</div>
+					
+					
+                    <div class="section">
+                        <!-- display enum values -->
+                        
+                        <h4 class="method-subtitle">Definition</h4>
+                        <code>typedef NS_ENUM(NSInteger, TSKPinValidationResult ) {<br>
+                            
+                            &nbsp;&nbsp; <a href="">TSKPinValidationResultSuccess</a>,<br>
+                            
+                            &nbsp;&nbsp; <a href="">TSKPinValidationResultFailed</a>,<br>
+                            
+                            &nbsp;&nbsp; <a href="">TSKPinValidationResultFailedInvalidCertificateChain</a>,<br>
+                            
+                            &nbsp;&nbsp; <a href="">TSKPinValidationResultFailedInvalidParameters</a>,<br>
+                            
+                            };</code>
+                    
+                    </div>
+                    
+                    <div class="section section-methods">
+                        <h4 class="method-subtitle">Constants</h4>
+                        <dl class="termdef">
+                            
+                            <dt><a name="" title="TSKPinValidationResultSuccess"></a><code>TSKPinValidationResultSuccess</code></dt>
+<dd>
+
+
+<p>   The server trust was succesfully evaluated and contained at least one of the configured pins.</p>
+
+
+
+
+
+    
+	<p>
+		Declared In <code class="declared-in-ref">TSKPinVerifier.h</code>.
+	</p>
+	
+</dd>
+                            
+                            <dt><a name="" title="TSKPinValidationResultFailed"></a><code>TSKPinValidationResultFailed</code></dt>
+<dd>
+
+
+<p>  The server trust was succesfully evaluated but did not contain any of the configured pins.</p>
+
+
+
+
+
+    
+	<p>
+		Declared In <code class="declared-in-ref">TSKPinVerifier.h</code>.
+	</p>
+	
+</dd>
+                            
+                            <dt><a name="" title="TSKPinValidationResultFailedInvalidCertificateChain"></a><code>TSKPinValidationResultFailedInvalidCertificateChain</code></dt>
+<dd>
+
+
+<p>  The server trust&rsquo;s evaluation failed: the server&rsquo;s certificate chain is not trusted.</p>
+
+
+
+
+
+    
+	<p>
+		Declared In <code class="declared-in-ref">TSKPinVerifier.h</code>.
+	</p>
+	
+</dd>
+                            
+                            <dt><a name="" title="TSKPinValidationResultFailedInvalidParameters"></a><code>TSKPinValidationResultFailedInvalidParameters</code></dt>
+<dd>
+
+
+<p>  The server trust could not be evaluated due to invalid parameters.</p>
+
+
+
+
+
+    
+	<p>
+		Declared In <code class="declared-in-ref">TSKPinVerifier.h</code>.
+	</p>
+	
+</dd>
+                            
+                        </dl>
+                    </div>
+                    
+
+                    
+                    
+
+                    
+
+                    
+                    <div class="method-subsection declared-in-section">
+                        <h4 class="method-subtitle">Declared In</h4>
+                        <p><code class="declared-in-ref">TSKPinVerifier.h</code></p>
+                    </div>
+                    
+                    
+                    
+                    
+          
+				</main>
+
+				<footer>
+					<div class="footer-copyright">
+						
+						<p class="copyright">Copyright &copy; 2015 TrustKit. All rights reserved. Updated: 2015-06-04</p>
+						
+						
+						<p class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.2.1 (build 1333)</a>.</p>
+						
+					</div>
+				</footer>
+			</div>
+		</div>
+	</article>
+
+	<script src="../js/script.js"></script>
+</body>
+</html>

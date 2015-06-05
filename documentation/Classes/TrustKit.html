@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<title>TrustKit Class Reference</title>
+
+	<link rel="stylesheet" href="../css/style.css">
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1.4">
+	<meta name="generator" content="appledoc 2.2.1 (build 1333)">
+</head>
+<body class="appledoc">
+	<header>
+		<div class="container" class="hide-in-xcode">
+			
+			<h1 id="library-title">
+				<a href="../index.html">TrustKit </a>
+			</h1>
+
+			<p id="developer-home">
+				<a href="../index.html">TrustKit</a>
+			</p>
+			
+		</div>
+	</header>
+
+	<aside>
+		<div class="container">
+			<nav>
+				<ul id="header-buttons" role="toolbar">
+					<li><a href="../index.html">Index</a></li>
+<li><a href="../hierarchy.html">Hierarchy</a></li>
+
+					<li id="on-this-page" role="navigation">
+						<label>
+							On This Page
+
+							<div class="chevron">
+								<div class="chevy chevron-left"></div>
+								<div class="chevy chevron-right"></div>
+							</div>
+
+							<select id="jump-to">
+	<option value="top">Jump To&#133;</option>
+	
+	<option value="overview">Overview</option>
+	
+
+	
+	
+	<option value="tasks">Tasks</option>
+	
+	
+
+	
+	
+
+	
+	<optgroup label="Class Methods">
+		
+		<option value="//api/name/initializeWithConfiguration:">+ initializeWithConfiguration:</option>
+		
+	</optgroup>
+	
+
+	
+	
+</select>
+						</label>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</aside>
+
+	<article>
+		<div id="overview_contents" class="container">
+			<div id="content">
+				<main role="main">
+					<h1 class="title">TrustKit Class Reference</h1>
+
+					
+					<div class="section section-specification"><table cellspacing="0"><tbody>
+						<tr>
+	<th>Inherits from</th>
+	<td>NSObject</td>
+</tr><tr>
+	<th>Declared in</th>
+	<td>TrustKit.h<br />TrustKit.m</td>
+</tr>
+						</tbody></table></div>
+					
+
+                    
+					
+					<div class="section section-overview">
+						<a title="Overview" name="overview"></a>
+						<h2 class="subtitle subtitle-overview">Overview</h2>
+						<p><code>TrustKit</code> is a class for configuring the global SSL pinning policy in an App that statically links TrustKit.</p>
+
+<p>Initializing TrustKit requires supplying a dictionary containing domain names as keys and dictionaries as values. Each domain dictionary should specify some configuration keys, which will specify the pinning policy for this domain. For example:</p>
+
+<pre><code> NSDictionary *trustKitConfig = @{
+     @"www.datatheorem.com" : @{
+         kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa2048],
+         kTSKPublicKeyHashes : @[
+             @"HXXQgxueCIU5TTLHob/bPbwcKOKw6DkfsTWYHbxbqTY=",
+             @"0SDf3cRToyZJaMsoS17oF72VMavLxj/N7WBNasNuiR8="
+             ]
+         }
+    @"yahoo.com" : @{
+        kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa4096],
+        kTSKPublicKeyHashes : @[
+            @"TQEtdMbmwFgYUifM4LDF+xgEtd0z69mPGmkp014d6ZY=",
+            @"rFjc3wG7lTZe43zeYTvPq8k4xdDEutCmIhI5dn4oCeE=",
+            ]
+        },
+        kTSKIncludeSubdomains : YES
+     };
+
+ [TrustKit initializeWithConfiguration:trustKitConfig];
+</code></pre>
+
+<p>  When dynamically linked, TrustKit is automatically initialized by reading configuration keys from the App&rsquo;s <em>Info.plist</em>, and no initialization method needs to be called.</p>
+
+<h3>Required Configuration Keys</h3>
+
+<h4><code>kTSKPublicKeyHashes</code></h4>
+
+<p>This value should be an array of SSL pins; each pin is the base64-encoded SHA-256 hash of a certificate&rsquo;s subject public key info. TrustKit will verify that at least one of the specifed pins is found in the server&rsquo;s certificate chain.</p>
+
+<h4><code>kTSKPublicKeyAlgorithms</code></h4>
+
+<p>This value should be an array of <code>kTSKAlgorithm</code> constants that TrustKit needs to support when computing pins. To minimize the performance impact of Trustkit, only one algorithm should be enabled.</p>
+
+<h3>Optional Configuration Keys</h3>
+
+<h4><code>kTSKIncludeSubdomains</code></h4>
+
+<p>If set to <code>YES</code>, also pin all the subdomains of the specified domain; default value is <code>NO</code>.</p>
+
+<h4><code>kTSKEnforcePinning</code></h4>
+
+<p>If set to <code>NO</code>, a pinning failure will not cause the SSL connection to fail; default value is <code>YES</code>.</p>
+
+<h4><code>kTSKReportUris</code></h4>
+
+<p>An array of URLs to which pin validation failures should be reported. The format of the reports is similar to the one described in the HPKP specification.</p>
+
+<h3>Public Key Algorithms Keys</h3>
+
+<p>Public key algorithms supported by TrustKit for computing SSL pins.</p>
+
+<h4><code>kTSKAlgorithmRsa2048</code></h4>
+
+<h4><code>kTSKAlgorithmRsa4096</code></h4>
+
+<h4><code>kTSKAlgorithmEcDsaSecp256r1</code></h4>
+					</div>
+					
+					
+
+					
+					
+					<div class="section section-tasks">
+						<a title="Tasks" name="tasks"></a>
+						
+
+						<a title="Initialization" name="task_Initialization"></a>
+						
+<h2 class="task-title">Initialization</h2>
+						<div class="task-list">
+							<div class="section-method">
+	<a name="//api/name/initializeWithConfiguration:" title="initializeWithConfiguration:"></a>
+	<h3 class="method-title"><code><a href="#//api/name/initializeWithConfiguration:">+&nbsp;initializeWithConfiguration:</a></code>
+</h3>
+
+	<div class="method-info">
+		<div class="pointy-thing"></div>
+
+		<div class="method-info-container">
+			
+			
+			<div class="method-subsection brief-description">
+				<p>Initializes the global SSL pinning policy with the supplied <a href="#//api/name/configuration">configuration</a>.</p>
+			</div>
+			
+		    
+
+			<div class="method-subsection method-declaration"><code>+ (void)initializeWithConfiguration:(NSDictionary *)<em>trustKitConfig</em></code></div>
+
+		    
+			
+			<div class="method-subsection arguments-section parameters">
+				<h4 class="method-subtitle parameter-title">Parameters</h4>
+				<table class="argument-def parameter-def">
+				
+					<tr>
+						<th scope="row" class="argument-name"><code>trustKitConfig</code></th>
+						<td><p>A dictionnary containing various keys for configuring the global SSL pinning policy.</p></td>
+					</tr>
+				
+				</table>
+			</div>
+			
+
+			
+
+			
+
+			
+			<div class="method-subsection discussion-section">
+				<h4 class="method-subtitle">Discussion</h4>
+				<p>This method should be called as early as possible in the App&rsquo;s lifecycle to ensure that the App&rsquo;s very first HTTPS connections are protected.</p><div class="warning"><p><strong>Warning:</strong> TrustKit can only be initialized once and calling this method multiple times will raise an exception.</p></div>
+			</div>
+			
+
+			
+
+			
+
+			
+			<div class="method-subsection declared-in-section">
+				<h4 class="method-subtitle">Declared In</h4>
+				<p><code class="declared-in-ref">TrustKit.h</code></p>
+			</div>
+			
+			
+		</div>
+	</div>
+</div>
+						</div>
+						
+					</div>
+					
+					
+
+                    
+                    
+          
+				</main>
+
+				<footer>
+					<div class="footer-copyright">
+						
+						<p class="copyright">Copyright &copy; 2015 TrustKit. All rights reserved. Updated: 2015-06-04</p>
+						
+						
+						<p class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.2.1 (build 1333)</a>.</p>
+						
+					</div>
+				</footer>
+			</div>
+		</div>
+	</article>
+
+	<script src="../js/script.js"></script>
+</body>
+</html>
