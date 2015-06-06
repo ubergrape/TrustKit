@@ -100,25 +100,28 @@
 
 <p>Initializing TrustKit requires supplying a dictionary containing domain names as keys and dictionaries as values. Each domain dictionary should specify some configuration keys, which will specify the pinning policy for this domain. For example:</p>
 
-<pre><code> NSDictionary *trustKitConfig = @{
-     @"www.datatheorem.com" : @{
-         kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa2048],
-         kTSKPublicKeyHashes : @[
-             @"HXXQgxueCIU5TTLHob/bPbwcKOKw6DkfsTWYHbxbqTY=",
-             @"0SDf3cRToyZJaMsoS17oF72VMavLxj/N7WBNasNuiR8="
-             ]
-         }
-    @"yahoo.com" : @{
-        kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa4096],
-        kTSKPublicKeyHashes : @[
-            @"TQEtdMbmwFgYUifM4LDF+xgEtd0z69mPGmkp014d6ZY=",
-            @"rFjc3wG7lTZe43zeYTvPq8k4xdDEutCmIhI5dn4oCeE=",
-            ]
-        },
-        kTSKIncludeSubdomains : YES
-     };
+<pre><code> NSDictionary *trustKitConfig;
+ trustKitConfig = @{
+                    @"www.datatheorem.com" : @{
+                            kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa2048],
+                            kTSKPublicKeyHashes : @[
+                                    @"HXXQgxueCIU5TTLHob/bPbwcKOKw6DkfsTWYHbxbqTY=",
+                                    @"0SDf3cRToyZJaMsoS17oF72VMavLxj/N7WBNasNuiR8="
+                                    ],
+                            kTSKEnforcePinning : @NO,
+                            kTSKReportUris : @[@"http://report.datatheorem.com/log_hpkp_report"],
+                            },
+                    @"yahoo.com" : @{
+                            kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa4096],
+                            kTSKPublicKeyHashes : @[
+                                    @"TQEtdMbmwFgYUifM4LDF+xgEtd0z69mPGmkp014d6ZY=",
+                                    @"rFjc3wG7lTZe43zeYTvPq8k4xdDEutCmIhI5dn4oCeE=",
+                                    ],
+                            kTSKIncludeSubdomains : @YES
+                            }
+                    };
 
- [TrustKit initializeWithConfiguration:trustKitConfig];
+  [TrustKit initializeWithConfiguration:trustKitConfig];
 </code></pre>
 
 <p>  When dynamically linked, TrustKit is automatically initialized by reading configuration keys from the App&rsquo;s <em>Info.plist</em>, and no initialization method needs to be called.</p>
@@ -127,11 +130,11 @@
 
 <h4><code>kTSKPublicKeyHashes</code></h4>
 
-<p>This value should be an array of SSL pins; each pin is the base64-encoded SHA-256 hash of a certificate&rsquo;s subject public key info. TrustKit will verify that at least one of the specifed pins is found in the server&rsquo;s certificate chain.</p>
+<p>An array of SSL pins; each pin is the base64-encoded SHA-256 hash of a certificate&rsquo;s Subject Public Key Info. TrustKit will verify that at least one of the specified pins is found in the server&rsquo;s evaluated certificate chain.</p>
 
 <h4><code>kTSKPublicKeyAlgorithms</code></h4>
 
-<p>This value should be an array of <code>kTSKAlgorithm</code> constants that TrustKit needs to support when computing pins. To minimize the performance impact of Trustkit, only one algorithm should be enabled.</p>
+<p>An array of <code>kTSKAlgorithm</code> constants to specify the public key algorithms for the keys to be pinned. TrustKit requires this information in order to compute SSL pins when validating a server&rsquo;s certificate chain, because there are no APIs to directly extract the key&rsquo;s algorithm from an SSL certificate. To minimize the performance impact of Trustkit, only one algorithm should be enabled.</p>
 
 <h3>Optional Configuration Keys</h3>
 
@@ -145,7 +148,11 @@
 
 <h4><code>kTSKReportUris</code></h4>
 
-<p>An array of URLs to which pin validation failures should be reported. The format of the reports is similar to the one described in the HPKP specification.</p>
+<p>An array of URLs to which pin validation failures should be reported. To minimize the performance impact of sending reports on each validation failure, the reports are uploaded using the background transfer service. For HTTPS report URLs, the HTTPS connections will ignore the SSL pinning policy and use the default certificate validation mechanisms, in order to maximize the chance of the reports reaching the server. The format of the reports is similar to the one described in the HPKP specification.</p>
+
+<h4><code>kTSKDisableDefaultReportUri</code></h4>
+
+<p>If set to <code>YES</code>, the default report URL for sending pin failure reports will be disabled. By default, pin failure reports are sent to a report server hosted by Data Theorem, for detecting potential CA compromises and man-in-the-middle attacks, as well as providing a free dashboard for developers. Only reports are sent, which contain the App&rsquo;s bundle ID and the server&rsquo;s hostname and certificate chain that failed validation. This behavior can be disabled by setting this key to <code>YES</code>.</p>
 
 <h3>Public Key Algorithms Keys</h3>
 
@@ -211,10 +218,22 @@
 			
 			<div class="method-subsection discussion-section">
 				<h4 class="method-subtitle">Discussion</h4>
-				<p>This method should be called as early as possible in the App&rsquo;s lifecycle to ensure that the App&rsquo;s very first HTTPS connections are protected.</p><div class="warning"><p><strong>Warning:</strong> TrustKit can only be initialized once and calling this method multiple times will raise an exception.</p></div>
+				<p>This method should be called as early as possible in the App&rsquo;s lifecycle to ensure that the App&rsquo;s very first HTTPS connections are validated by TrustKit.</p>
 			</div>
 			
 
+			
+			<div class="method-subsection arguments-section exceptions">
+				<h4 class="method-subtitle exception-title">Exceptions</h4>
+				<table class="argument-def exception-def">
+				
+					<tr>
+						<th scope="row" class="argument-name"><code>NSException</code></th>
+						<td><p>Thrown when the supplied <a href="#//api/name/configuration">configuration</a> is invalid or TrustKit has already been initialized.</p></td>
+					</tr>
+				
+				</table>
+			</div>
 			
 
 			
@@ -243,7 +262,7 @@
 				<footer>
 					<div class="footer-copyright">
 						
-						<p class="copyright">Copyright &copy; 2015 TrustKit. All rights reserved. Updated: 2015-06-04</p>
+						<p class="copyright">Copyright &copy; 2015 TrustKit. All rights reserved. Updated: 2015-06-06</p>
 						
 						
 						<p class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.2.1 (build 1333)</a>.</p>
