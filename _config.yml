@@ -9,7 +9,7 @@ title:               TrustKit
 tagline:             Easy SSL pinning for iOS and OS X
 url:                 https://datatheorem.github.io/TrustKit
 paginate:            1
-baseurl:             ""
+baseurl:             https://datatheorem.github.io/TrustKit
 
 # Assets
 #
