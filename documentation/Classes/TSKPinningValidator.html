@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>TSKPinVerifier Class Reference</title>
+	<title>TSKPinningValidator Class Reference</title>
 
 	<link rel="stylesheet" href="../css/style.css">
 	<meta name="viewport" content="initial-scale=1, maximum-scale=1.4">
@@ -58,7 +58,7 @@
 	
 	<optgroup label="Class Methods">
 		
-		<option value="//api/name/verifyPinForTrust:andHostname:">+ verifyPinForTrust:andHostname:</option>
+		<option value="//api/name/evaluateTrust:forHostname:">+ evaluateTrust:forHostname:</option>
 		
 	</optgroup>
 	
@@ -77,7 +77,7 @@
 		<div id="overview_contents" class="container">
 			<div id="content">
 				<main role="main">
-					<h1 class="title">TSKPinVerifier Class Reference</h1>
+					<h1 class="title">TSKPinningValidator Class Reference</h1>
 
 					
 					<div class="section section-specification"><table cellspacing="0"><tbody>
@@ -86,7 +86,7 @@
 	<td>NSObject</td>
 </tr><tr>
 	<th>Declared in</th>
-	<td>TSKPinVerifier.h<br />TSKPinVerifier.m</td>
+	<td>TSKPinningValidator.h<br />TSKPinningValidator.m</td>
 </tr>
 						</tbody></table></div>
 					
@@ -96,18 +96,22 @@
 					<div class="section section-overview">
 						<a title="Overview" name="overview"></a>
 						<h2 class="subtitle subtitle-overview">Overview</h2>
-						<p><code>TSKPinVerifier</code> is a class for manually verifying a server&rsquo;s identity against the global SSL pinning policy.</p>
+						<p><code>TSKPinningValidator</code> is a class for manually verifying a server&rsquo;s identity against the global SSL pinning policy.</p>
 
-<p>In a few specific scenarios, <a href="../Classes/TrustKit.html">TrustKit</a> cannot intercept outgoing SSL connections and automatically validate the server&rsquo;s identity against the pinning policy. For these connections, the pin validation must be manually triggered: the server&rsquo;s trust object, which contains its certificate chain, needs to be retrieved or built before being passed to <code>TSKPinVerifier</code> for validation.</p>
+<p>In a few specific scenarios, <a href="../Classes/TrustKit.html">TrustKit</a> cannot intercept outgoing SSL connections and automatically validate the server&rsquo;s identity against the pinning policy. For these connections, the pin validation must be manually triggered: the server&rsquo;s trust object, which contains its certificate chain, needs to be retrieved or built before being passed to <code>TSKPinningValidator</code> for validation.</p>
 
 <p>The following scenarios require manual pin validation:</p>
 
+<ol>
+<li>Connections initiated from an external process, where <a href="../Classes/TrustKit.html">TrustKit</a> does not get loaded:
+
 <ul>
-<li>Connections initiated from an external process, where <a href="../Classes/TrustKit.html">TrustKit</a> does not get loaded:</li>
 <li><code>WKWebView</code> connections: the server&rsquo;s trust object can be retrieved within the <code>webView:didReceiveAuthenticationChallenge:completionHandler:</code> method.</li>
 <li><code>NSURLSession</code> connections using the background transfer service: the server&rsquo;s trust object can be retrieved within the <code>application:handleEventsForBackgroundURLSession:completionHandler:</code> method.</li>
-<li>Connections initiated using a third-party SSL library such as OpenSSL, instead of Apple&rsquo;s SecureTransport. The server&rsquo;s trust object needs to be built using its certificate chain.</li>
 </ul>
+</li>
+<li>Connections initiated using a third-party SSL library such as OpenSSL, instead of Apple&rsquo;s SecureTransport. The server&rsquo;s trust object needs to be built using the received certificate chain.</li>
+</ol>
 
 					</div>
 					
@@ -119,13 +123,13 @@
 						<a title="Tasks" name="tasks"></a>
 						
 
-						<a title="Manual SSL Pin Validation" name="task_Manual SSL Pin Validation"></a>
+						<a title="Manual SSL Pinning Validation" name="task_Manual SSL Pinning Validation"></a>
 						
-<h2 class="task-title">Manual SSL Pin Validation</h2>
+<h2 class="task-title">Manual SSL Pinning Validation</h2>
 						<div class="task-list">
 							<div class="section-method">
-	<a name="//api/name/verifyPinForTrust:andHostname:" title="verifyPinForTrust:andHostname:"></a>
-	<h3 class="method-title"><code><a href="#//api/name/verifyPinForTrust:andHostname:">+&nbsp;verifyPinForTrust:andHostname:</a></code>
+	<a name="//api/name/evaluateTrust:forHostname:" title="evaluateTrust:forHostname:"></a>
+	<h3 class="method-title"><code><a href="#//api/name/evaluateTrust:forHostname:">+&nbsp;evaluateTrust:forHostname:</a></code>
 </h3>
 
 	<div class="method-info">
@@ -135,12 +139,12 @@
 			
 			
 			<div class="method-subsection brief-description">
-				<p>Verify the validity of the supplied server trust against the global SSL pinning policy previously configured.</p>
+				<p>Evaluate the supplied server trust against the global SSL pinning policy previously configured. If the validation fails, pin failure reports will be sent accordingly.</p>
 			</div>
 			
 		    
 
-			<div class="method-subsection method-declaration"><code>+ (TSKPinValidationResult)verifyPinForTrust:(SecTrustRef)<em>serverTrust</em> andHostname:(NSString *)<em>serverHostname</em></code></div>
+			<div class="method-subsection method-declaration"><code>+ (TSKPinValidationResult)evaluateTrust:(SecTrustRef)<em>serverTrust</em> forHostname:(NSString *)<em>serverHostname</em></code></div>
 
 		    
 			
@@ -150,7 +154,7 @@
 				
 					<tr>
 						<th scope="row" class="argument-name"><code>serverTrust</code></th>
-						<td><p>The trust object representing the server&rsquo;s certificate chain. The trust&rsquo;s validation policy is always overriden to ensure all the proper SSL policies (expiration, hostname validation, etc.) are enabled.</p></td>
+						<td><p>The trust object representing the server&rsquo;s certificate chain. The trust&rsquo;s evaluation policy is always overridden using <code>SecTrustSetPolicies()</code> to ensure all the proper SSL checks (expiration, hostname validation, etc.) are enabled.</p></td>
 					</tr>
 				
 					<tr>
@@ -165,7 +169,7 @@
 			
 			<div class="method-subsection return">
 				<h4 class="method-subtitle parameter-title">Return Value</h4>
-				<p>The result of validation. See <a href="../Constants/TSKPinValidationResult.html"><code>TSKPinValidationResult</code></a> for possible values.</p>
+				<p>The result of the validation. See <a href="../Constants/TSKPinValidationResult.html"><code>TSKPinValidationResult</code></a> for possible values.</p>
 			</div>
 			
 
@@ -179,13 +183,25 @@
 			
 
 			
+			<div class="method-subsection arguments-section exceptions">
+				<h4 class="method-subtitle exception-title">Exceptions</h4>
+				<table class="argument-def exception-def">
+				
+					<tr>
+						<th scope="row" class="argument-name"><code>NSException</code></th>
+						<td><p>Thrown when <a href="../Classes/TrustKit.html">TrustKit</a> has not been initialized with a pinning policy.</p></td>
+					</tr>
+				
+				</table>
+			</div>
+			
 
 			
 
 			
 			<div class="method-subsection declared-in-section">
 				<h4 class="method-subtitle">Declared In</h4>
-				<p><code class="declared-in-ref">TSKPinVerifier.h</code></p>
+				<p><code class="declared-in-ref">TSKPinningValidator.h</code></p>
 			</div>
 			
 			
@@ -206,7 +222,7 @@
 				<footer>
 					<div class="footer-copyright">
 						
-						<p class="copyright">Copyright &copy; 2015 TrustKit. All rights reserved. Updated: 2015-07-05</p>
+						<p class="copyright">Copyright &copy; 2015 TrustKit. All rights reserved. Updated: 2015-07-10</p>
 						
 						
 						<p class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.2.1 (build 1333)</a>.</p>
