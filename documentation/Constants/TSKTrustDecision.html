@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>TSKPinValidationResult Constants Reference</title>
+	<title>TSKTrustDecision Constants Reference</title>
 
 	<link rel="stylesheet" href="../css/style.css">
 	<meta name="viewport" content="initial-scale=1, maximum-scale=1.4">
@@ -59,7 +59,7 @@
 		<div id="overview_contents" class="container">
 			<div id="content">
 				<main role="main">
-					<h1 class="title">TSKPinValidationResult Constants Reference</h1>
+					<h1 class="title">TSKTrustDecision Constants Reference</h1>
 
 					
 					<div class="section section-specification"><table cellspacing="0"><tbody>
@@ -75,7 +75,7 @@
 					
 
                     
-                    <h3 class="subsubtitle method-title">TSKPinValidationResult</h3>
+                    <h3 class="subsubtitle method-title">TSKTrustDecision</h3>
                     
 					
 					<div class="section section-overview">
@@ -87,19 +87,13 @@
                         <!-- display enum values -->
                         
                         <h4 class="method-subtitle">Definition</h4>
-                        <code>typedef NS_ENUM(NSInteger, TSKPinValidationResult ) {<br>
+                        <code>typedef NS_ENUM(NSInteger, TSKTrustDecision ) {<br>
                             
-                            &nbsp;&nbsp; <a href="">TSKPinValidationResultSuccess</a>,<br>
+                            &nbsp;&nbsp; <a href="">TSKTrustDecisionShouldAllowConnection</a>,<br>
                             
-                            &nbsp;&nbsp; <a href="">TSKPinValidationResultFailed</a>,<br>
+                            &nbsp;&nbsp; <a href="">TSKTrustDecisionShouldBlockConnection</a>,<br>
                             
-                            &nbsp;&nbsp; <a href="">TSKPinValidationResultFailedCertificateChainNotTrusted</a>,<br>
-                            
-                            &nbsp;&nbsp; <a href="">TSKPinValidationResultErrorInvalidParameters</a>,<br>
-                            
-                            &nbsp;&nbsp; <a href="">TSKPinValidationResultDomainNotPinned</a>,<br>
-                            
-                            &nbsp;&nbsp; <a href="">TSKPinValidationResultFailedUserDefinedTrustAnchor</a>,<br>
+                            &nbsp;&nbsp; <a href="">TSKTrustDecisionDomainNotPinned</a>,<br>
                             
                             };</code>
                     
@@ -109,11 +103,12 @@
                         <h4 class="method-subtitle">Constants</h4>
                         <dl class="termdef">
                             
-                            <dt><a name="" title="TSKPinValidationResultSuccess"></a><code>TSKPinValidationResultSuccess</code></dt>
+                            <dt><a name="" title="TSKTrustDecisionShouldAllowConnection"></a><code>TSKTrustDecisionShouldAllowConnection</code></dt>
 <dd>
 
 
-<p>The server trust was succesfully evaluated and contained at least one of the configured pins.</p>
+<p>Based on the server&rsquo;s certificate chain and the global pinning policy for this domain, the SSL connection should be allowed.
+This return value does not necessarily mean that the pinning validation succeded (for example if <code>kTSKEnforcePinning</code> was set to <code>NO</code> for this domain). If a pinning validation failure occured and if a report URI was configured, a pin failure report was sent.</p>
 
 
 
@@ -126,11 +121,12 @@
 	
 </dd>
                             
-                            <dt><a name="" title="TSKPinValidationResultFailed"></a><code>TSKPinValidationResultFailed</code></dt>
+                            <dt><a name="" title="TSKTrustDecisionShouldBlockConnection"></a><code>TSKTrustDecisionShouldBlockConnection</code></dt>
 <dd>
 
 
-<p>The server trust was succesfully evaluated but did not contain any of the configured pins.</p>
+<p>Based on the server&rsquo;s certificate chain and the global pinning policy for this domain, the SSL connection should be blocked.
+A pinning validation failure occured and if a report URI was configured, a pin failure report was sent.</p>
 
 
 
@@ -143,62 +139,12 @@
 	
 </dd>
                             
-                            <dt><a name="" title="TSKPinValidationResultFailedCertificateChainNotTrusted"></a><code>TSKPinValidationResultFailedCertificateChainNotTrusted</code></dt>
+                            <dt><a name="" title="TSKTrustDecisionDomainNotPinned"></a><code>TSKTrustDecisionDomainNotPinned</code></dt>
 <dd>
 
 
-<p>The server trust&rsquo;s evaluation failed: the server&rsquo;s certificate chain is not trusted.</p>
-
-
-
-
-
-    
-	<p>
-		Declared In <code class="declared-in-ref">TSKPinningValidator.h</code>.
-	</p>
-	
-</dd>
-                            
-                            <dt><a name="" title="TSKPinValidationResultErrorInvalidParameters"></a><code>TSKPinValidationResultErrorInvalidParameters</code></dt>
-<dd>
-
-
-<p>The server trust could not be evaluated due to invalid parameters.</p>
-
-
-
-
-
-    
-	<p>
-		Declared In <code class="declared-in-ref">TSKPinningValidator.h</code>.
-	</p>
-	
-</dd>
-                            
-                            <dt><a name="" title="TSKPinValidationResultDomainNotPinned"></a><code>TSKPinValidationResultDomainNotPinned</code></dt>
-<dd>
-
-
-<p>The supplied hostname does not have a pinning policy configured; no validation was performed.</p>
-
-
-
-
-
-    
-	<p>
-		Declared In <code class="declared-in-ref">TSKPinningValidator.h</code>.
-	</p>
-	
-</dd>
-                            
-                            <dt><a name="" title="TSKPinValidationResultFailedUserDefinedTrustAnchor"></a><code>TSKPinValidationResultFailedUserDefinedTrustAnchor</code></dt>
-<dd>
-
-
-<p>The server trust was succesfully evaluated but did not contain any of the configured pins. However, the certificate chain terminates at a user-defined trust anchor (ie. a custom/private CA that was manually added to OS X&rsquo;s trust store). Only available on OS X.</p>
+<p>No pinning policy was configured for this domain and <a href="../Classes/TrustKit.html">TrustKit</a> did not validate the server&rsquo;s identity.
+Because this will happen in an authentication handler, it means that the server&rsquo;s <em>serverTrust</em> object <strong>needs</strong> to be verified against the device&rsquo;s trust store using <code>SecTrustEvaluate()</code>. Failing to do so will <strong>disable SSL certificate validation</strong>.</p>
 
 
 
@@ -235,7 +181,7 @@
 				<footer>
 					<div class="footer-copyright">
 						
-						<p class="copyright">Copyright &copy; 2015 TrustKit. All rights reserved. Updated: 2015-07-10</p>
+						<p class="copyright">Copyright &copy; 2015 TrustKit. All rights reserved. Updated: 2015-10-20</p>
 						
 						
 						<p class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.2.1 (build 1333)</a>.</p>

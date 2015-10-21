@@ -96,47 +96,147 @@
 					<div class="section section-overview">
 						<a title="Overview" name="overview"></a>
 						<h2 class="subtitle subtitle-overview">Overview</h2>
-						<p><code>TrustKit</code> is a class for configuring the global SSL pinning policy in an App that statically links TrustKit.</p>
+						<p><code>TrustKit</code> is a class for programmatically configuring the global SSL pinning policy within an App.</p>
 
-<p>Initializing TrustKit requires supplying a dictionary containing domain names as keys and dictionaries as values. Each domain dictionary should specify some configuration keys, which will specify the pinning policy for this domain. For example:</p>
+<p>  The policy can be set either by adding it to the App&rsquo;s <em>Info.plist</em> under the <code>TSKConfiguration</code> key, or by programmatically supplying it using the <code>TrustKit</code> class described here. Throughout the App&rsquo;s lifecycle, TrustKit can only be initialized once so only one of the two techniques should be used.</p>
 
-<pre><code> NSDictionary *trustKitConfig;
- trustKitConfig = @{
-                    @"www.datatheorem.com" : @{
-                            kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa2048],
-                            kTSKPublicKeyHashes : @[
-                                    @"HXXQgxueCIU5TTLHob/bPbwcKOKw6DkfsTWYHbxbqTY=",
-                                    @"0SDf3cRToyZJaMsoS17oF72VMavLxj/N7WBNasNuiR8="
-                                    ],
-                            kTSKEnforcePinning : @NO,
-                            kTSKReportUris : @[@"http://report.datatheorem.com/log_hpkp_report"],
-                            },
-                    @"yahoo.com" : @{
-                            kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa4096],
-                            kTSKPublicKeyHashes : @[
-                                    @"TQEtdMbmwFgYUifM4LDF+xgEtd0z69mPGmkp014d6ZY=",
-                                    @"rFjc3wG7lTZe43zeYTvPq8k4xdDEutCmIhI5dn4oCeE=",
-                                    ],
-                            kTSKIncludeSubdomains : @YES
-                            }
-                    };
+<p>A TrustKit SSL pinning policy is a dictionary which contains some global, App-wide settings as well as domain-specific configuration keys. The following table shows the keys and their types, and uses indentation to indicate structure:</p>
 
-  [TrustKit initializeWithConfiguration:trustKitConfig];
+<table>
+<thead>
+<tr>
+<th> Key                                          </th>
+<th> Type       </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> <code>TSKSwizzleNetworkDelegates</code>                 </td>
+<td> Boolean    </td>
+</tr>
+<tr>
+<td> <code>TSKIgnorePinningForUserDefinedTrustAnchors</code> </td>
+<td> Boolean    </td>
+</tr>
+<tr>
+<td> <code>TSKPinnedDomains</code>                           </td>
+<td> Dictionary </td>
+</tr>
+<tr>
+<td> __ <code>&lt;domain-name-to-pin-as-string&gt;</code>          </td>
+<td> Dictionary </td>
+</tr>
+<tr>
+<td> ____ <code>TSKPublicKeyHashes</code>                    </td>
+<td> Array      </td>
+</tr>
+<tr>
+<td> ____ <code>TSKPublicKeyAlgorithms</code>                </td>
+<td> Array      </td>
+</tr>
+<tr>
+<td> ____ <code>TSKIncludeSubdomains</code>                  </td>
+<td> Boolean    </td>
+</tr>
+<tr>
+<td> ____ <code>TSKEnforcePinning</code>                     </td>
+<td> Boolean    </td>
+</tr>
+<tr>
+<td> ____ <code>TSKReportUris</code>                         </td>
+<td> Array      </td>
+</tr>
+<tr>
+<td> ____ <code>kTSKDisableDefaultReportUri</code>           </td>
+<td> Boolean    </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>When setting the pinning policy programmatically, it has to be supplied to the <code>initializeWithConfiguration:</code> method as a dictionnary. For example:</p>
+
+<pre><code>NSDictionary *trustKitConfig =
+@{
+  kTSKSwizzleNetworkDelegates: @YES,
+  kTSKPinnedDomains : @{
+          @"www.datatheorem.com" : @{
+                  kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa2048],
+                  kTSKPublicKeyHashes : @[
+                          @"HXXQgxueCIU5TTLHob/bPbwcKOKw6DkfsTWYHbxbqTY=",
+                          @"0SDf3cRToyZJaMsoS17oF72VMavLxj/N7WBNasNuiR8="
+                          ],
+                  kTSKEnforcePinning : @NO,
+                  kTSKReportUris : @[@"http://report.datatheorem.com/log_report"],
+                  },
+          @"yahoo.com" : @{
+                  kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa4096],
+                  kTSKPublicKeyHashes : @[
+                          @"TQEtdMbmwFgYUifM4LDF+xgEtd0z69mPGmkp014d6ZY=",
+                          @"rFjc3wG7lTZe43zeYTvPq8k4xdDEutCmIhI5dn4oCeE=",
+                          ],
+                  kTSKIncludeSubdomains : @YES
+                  }
+          }};
+
+[TrustKit initializeWithConfiguration:trustKitConfig];
 </code></pre>
 
-<p>  It is also possible to supply the pinning policy by adding these configuration keys to the App&rsquo;s <em>Info.plist</em> under a <code>TSKConfiguration</code> dictionary key. When doing so, no method needs to be called and TrustKit will automatically be initialized with the policy.</p>
+<p>Similarly, TrustKit can be initialized in Swift:</p>
 
-<h3>Required Configuration Keys</h3>
+<pre><code> let trustKitConfig = [
+     kTSKPinnedDomains: [
+         "yahoo.com": [
+             kTSKPublicKeyAlgorithms: [kTSKAlgorithmRsa2048],
+             kTSKPublicKeyHashes: [
+                 "JbQbUG5JMJUoI6brnx0x3vZF6jilxsapbXGVfjhN8Fg=",
+                 "WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18="
+               ],]]]
+
+ TrustKit.initializeWithConfiguration(config)
+</code></pre>
+
+<p>  The various configuration keys that can be specified in the policy are described below.</p>
+
+<h3>Required Global Configuration Keys</h3>
+
+<h4><code>kTSKPinnedDomains</code></h4>
+
+<p>A dictionary with domains (such as <em>www.domain.com</em>) as keys and dictionaries as values.</p>
+
+<p>Each entry should contain domain-specific settings for performing pinning validation when connecting to the domain, including for example the domain&rsquo;s public key hashes. A list of all domain-specific keys is available in the &ldquo;Domain-specific Keys&rdquo; sections.</p>
+
+<h3>Optional Global Configuration Keys</h3>
+
+<h4><code>kTSKSwizzleNetworkDelegates</code></h4>
+
+<p>If set to <code>YES</code>, TrustKit will perform method swizzling on the App&rsquo;s <code>NSURLConnection</code> and <code>NSURLSession</code> delegates in order to automatically add SSL pinning validation to the App&rsquo;s connections; default value is <code>YES</code>.</p>
+
+<p>Swizzling allows enabling pinning within an App without having to find and modify each and every instance of <code>NSURLConnection</code> or <code>NSURLSession</code> delegates. However, it might clash with anti-tampering mechanisms, as well as analytics SDKs that also perform swizzling of the App&rsquo;s network delegates. In such scenarios or if the developer wants a tigher control on the App&rsquo;s networking behavior, <code>kTSKSwizzleNetworkDelegates</code> should be set to <code>NO</code>; the developer should then manually add pinning validation to the App&rsquo;s authentication handlers.</p>
+
+<p>See the <a href="../Classes/TSKPinningValidator.html"><code>TSKPinningValidator</code></a> class for instructions on how to do so.</p>
+
+<h4><code>kTSKIgnorePinningForUserDefinedTrustAnchors</code> (OS X only)</h4>
+
+<p>If set to <code>YES</code>, pinning validation will be skipped if the server&rsquo;s certificate chain terminates at a user-defined trust anchor (such as a root CA that isn&rsquo;t part of OS X&rsquo;s default trust store) and no pin failure reports will be sent; default value is <code>YES</code>.</p>
+
+<p>This is useful for allowing SSL connections through corporate proxies or firewalls. See &ldquo;How does key pinning interact with local proxies and filters?&rdquo; within the Chromium security FAQ at <a href="https://www.chromium.org/Home/chromium-security/security-faq">https://www.chromium.org/Home/chromium-security/security-faq</a> for more information.</p>
+
+<h3>Required Domain-specific Keys</h3>
 
 <h4><code>kTSKPublicKeyHashes</code></h4>
 
-<p>An array of SSL pins; each pin is the base64-encoded SHA-256 hash of a certificate&rsquo;s Subject Public Key Info. TrustKit will verify that at least one of the specified pins is found in the server&rsquo;s evaluated certificate chain.</p>
+<p>An array of SSL pins, where each pin is the base64-encoded SHA-256 hash of a certificate&rsquo;s Subject Public Key Info.</p>
+
+<p>TrustKit will verify that at least one of the specified pins is found in the server&rsquo;s evaluated certificate chain.</p>
 
 <h4><code>kTSKPublicKeyAlgorithms</code></h4>
 
-<p>An array of <code>kTSKAlgorithm</code> constants to specify the public key algorithms for the keys to be pinned. TrustKit requires this information in order to compute SSL pins when validating a server&rsquo;s certificate chain, because there are no APIs to directly extract the key&rsquo;s algorithm from an SSL certificate. To minimize the performance impact of Trustkit, only one algorithm should be enabled.</p>
+<p>An array of <code>kTSKAlgorithm</code> constants to specify the public key algorithms for the keys to be pinned.</p>
 
-<h3>Optional Configuration Keys</h3>
+<p>TrustKit requires this information in order to compute SSL pins when validating a server&rsquo;s certificate chain, because the <code>Security</code> framework does not provide APIs to extract the key&rsquo;s algorithm from an SSL certificate. To minimize the performance impact of Trustkit, only one algorithm should be enabled.</p>
+
+<h3>Optional Domain-specific Keys</h3>
 
 <h4><code>kTSKIncludeSubdomains</code></h4>
 
@@ -144,15 +244,20 @@
 
 <h4><code>kTSKEnforcePinning</code></h4>
 
-<p>If set to <code>NO</code>, TrustKit will not block SSL connections that caused a pin or certificate validation error; default value is <code>YES</code>. When verifying a server&rsquo;s identity, TrustKit validates the server&rsquo;s certificate chain and also checks for the presence of one of the configured SSL pins. When a pinning failure occurs, pin failure reports will still be sent to the configured report URIs.</p>
+<p>If set to <code>NO</code>, TrustKit will not block SSL connections that caused a pin or certificate validation error; default value is <code>YES</code>.</p>
+
+<p>When a pinning failure occurs, pin failure reports will always be sent to the configured report URIs regardless of the value of <code>kTSKEnforcePinning</code>.</p>
 
 <h4><code>kTSKReportUris</code></h4>
 
-<p>An array of URLs to which pin validation failures should be reported. To minimize the performance impact of sending reports on each validation failure, the reports are uploaded using the background transfer service. For HTTPS report URLs, the HTTPS connections will ignore the SSL pinning policy and use the default certificate validation mechanisms, in order to maximize the chance of the reports reaching the server. The format of the reports is similar to the one described in RFC 7469 for the HPKP specification:</p>
+<p>An array of URLs to which pin validation failures should be reported.</p>
+
+<p>To minimize the performance impact of sending reports on each validation failure, the reports are uploaded using the background transfer service and are also rate-limited to one per day and per type of failure. For HTTPS report URLs, the HTTPS connections will ignore the SSL pinning policy and use the default certificate validation mechanisms, in order to maximize the chance of the reports reaching the server. The format of the reports is similar to the one described in RFC 7469 for the HPKP specification:</p>
 
 <pre><code>{
     "app-bundle-id":"com.example.ABC",
     "app-version":"1.0",
+    "app-vendor-id":"599F9C00-92DC-4B5C-9464-7971F01F8370",
     "date-time": "2015-07-10T20:03:14Z",
     "hostname": "mail.example.com",
     "port": 0,
@@ -171,13 +276,9 @@
 
 <h4><code>kTSKDisableDefaultReportUri</code></h4>
 
-<p>If set to <code>YES</code>, the default report URL for sending pin failure reports will be disabled; default value is <code>NO</code>.
-By default, pin failure reports are sent to a report server hosted by Data Theorem, for detecting potential CA compromises and man-in-the-middle attacks, as well as providing a free dashboard for developers. Only pin failure reports are sent, which contain the App&rsquo;s bundle ID and the server&rsquo;s hostname and certificate chain that failed validation.</p>
+<p>If set to <code>YES</code>, the default report URL for sending pin failure reports will be disabled; default value is <code>NO</code>.</p>
 
-<h4><code>kTSKIgnorePinningForUserDefinedTrustAnchors</code> (OS X only)</h4>
-
-<p>If set to <code>YES</code>, pinning validation will be skipped if the server&rsquo;s certificate chain terminates at a user-defined trust anchor (such as a root CA that isn&rsquo;t part of OS X&rsquo;s default trust store) and no pin failure reports will be sent; default value is <code>YES</code>.
-This is useful for allowing SSL connections through corporate proxies or firewalls. See &ldquo;How does key pinning interact with local proxies and filters?&rdquo; within the Chromium security FAQ at <a href="https://www.chromium.org/Home/chromium-security/security-faq">https://www.chromium.org/Home/chromium-security/security-faq</a> for more information.</p>
+<p>By default, pin failure reports are sent to a report server hosted by Data Theorem, for detecting potential CA compromises and man-in-the-middle attacks, as well as providing a free dashboard for developers; email info@datatheorem.com if you&rsquo;d like a dashboard for your App. Only pin failure reports are sent, which contain the App&rsquo;s bundle ID, the IDFV, and the server&rsquo;s hostname and certificate chain that failed validation.</p>
 
 <h3>Public Key Algorithms Keys</h3>
 
@@ -219,7 +320,7 @@ This is useful for allowing SSL connections through corporate proxies or firewal
 			
 		    
 
-			<div class="method-subsection method-declaration"><code>+ (void)initializeWithConfiguration:(NSDictionary *)<em>trustKitConfig</em></code></div>
+			<div class="method-subsection method-declaration"><code>+ (void)initializeWithConfiguration:(nonnull NSDictionary *)<em>trustKitConfig</em></code></div>
 
 		    
 			
@@ -287,7 +388,7 @@ This is useful for allowing SSL connections through corporate proxies or firewal
 				<footer>
 					<div class="footer-copyright">
 						
-						<p class="copyright">Copyright &copy; 2015 TrustKit. All rights reserved. Updated: 2015-07-10</p>
+						<p class="copyright">Copyright &copy; 2015 TrustKit. All rights reserved. Updated: 2015-10-20</p>
 						
 						
 						<p class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.2.1 (build 1333)</a>.</p>
