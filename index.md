@@ -6,7 +6,7 @@ title: Readme
 TrustKit
 ========
 
-[![Build Status](https://travis-ci.org/datatheorem/TrustKit.svg)](https://travis-ci.org/datatheorem/TrustKit) [![Version Status](https://img.shields.io/cocoapods/v/TrustKit.svg?style=flat)](https://cocoapods.org/pods/TrustKit) [![Platform](https://img.shields.io/cocoapods/p/TrustKit.svg?style=flat)](https://cocoapods.org/pods/TrustKit) [![License MIT](https://img.shields.io/cocoapods/l/TrustKit.svg?style=flat)](https://en.wikipedia.org/wiki/MIT_License)
+[![Build Status](https://travis-ci.org/datatheorem/TrustKit.svg?branch=1.2.0)](https://travis-ci.org/datatheorem/TrustKit) [![Version Status](https://img.shields.io/cocoapods/v/TrustKit.svg?style=flat)](https://cocoapods.org/pods/TrustKit) [![Platform](https://img.shields.io/cocoapods/p/TrustKit.svg?style=flat)](https://cocoapods.org/pods/TrustKit) [![License MIT](https://img.shields.io/cocoapods/l/TrustKit.svg?style=flat)](https://en.wikipedia.org/wiki/MIT_License)
 
 **TrustKit** is an open source framework that makes it easy to deploy SSL public key pinning in any iOS or OS X App; it supports both Swift and Objective-C Apps.
 
@@ -37,15 +37,11 @@ Sample Usage
 
 **TrustKit** can be deployed using CocoaPods, by adding the following line to your Podfile:
 
-```ruby
-pod 'TrustKit'
-```
+    pod 'TrustKit'
 
 Then run:
 
-```sh
-$ pod install
-```
+    pod install
 
 Then, the deploying SSL pinning in the App requires initializing **TrustKit** 
 with a pinning policy (domains, Subject Public Key Info hashes, and additional settings).
@@ -56,47 +52,44 @@ The policy can be configured within the App's `Info.plist`:
 
 Alternatively, the pinning policy can be set programmatically:
 
-```objc
-NSDictionary *trustKitConfig =
-@{
-  kTSKSwizzleNetworkDelegates: @YES,
-  kTSKPinnedDomains : @{
-          @"www.datatheorem.com" : @{
-                  kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa2048],
-                  kTSKPublicKeyHashes : @[
-                          @"HXXQgxueCIU5TTLHob/bPbwcKOKw6DkfsTWYHbxbqTY=",
-                          @"0SDf3cRToyZJaMsoS17oF72VMavLxj/N7WBNasNuiR8="
-                          ],
-                  kTSKEnforcePinning : @NO,
-                  kTSKReportUris : @[@"http://report.datatheorem.com/log_report"],
-                  },
-          @"yahoo.com" : @{
-                  kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa4096],
-                  kTSKPublicKeyHashes : @[
-                          @"TQEtdMbmwFgYUifM4LDF+xgEtd0z69mPGmkp014d6ZY=",
-                          @"rFjc3wG7lTZe43zeYTvPq8k4xdDEutCmIhI5dn4oCeE=",
-                          ],
-                  kTSKIncludeSubdomains : @YES
-                  }
-          }};
+    NSDictionary *trustKitConfig =
+    @{
+      kTSKSwizzleNetworkDelegates: @YES,
+      kTSKPinnedDomains : @{
+              @"www.datatheorem.com" : @{
+                      kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa2048],
+                      kTSKPublicKeyHashes : @[
+                              @"HXXQgxueCIU5TTLHob/bPbwcKOKw6DkfsTWYHbxbqTY=",
+                              @"0SDf3cRToyZJaMsoS17oF72VMavLxj/N7WBNasNuiR8="
+                              ],
+                      kTSKEnforcePinning : @NO,
+                      kTSKReportUris : @[@"http://report.datatheorem.com/log_report"],
+                      },
+              @"yahoo.com" : @{
+                      kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa4096],
+                      kTSKPublicKeyHashes : @[
+                              @"TQEtdMbmwFgYUifM4LDF+xgEtd0z69mPGmkp014d6ZY=",
+                              @"rFjc3wG7lTZe43zeYTvPq8k4xdDEutCmIhI5dn4oCeE=",
+                              ],
+                      kTSKIncludeSubdomains : @YES
+                      }
+              }};
 
-[TrustKit initializeWithConfiguration:trustKitConfig];
-```
+    [TrustKit initializeWithConfiguration:trustKitConfig];
+
 
 The policy can also be set programmatically in Swift Apps:
  
-```swift
-let trustKitConfig = [
-   kTSKPinnedDomains: [
-       "yahoo.com": [
-           kTSKPublicKeyAlgorithms: [kTSKAlgorithmRsa2048],
-           kTSKPublicKeyHashes: [
-               "JbQbUG5JMJUoI6brnx0x3vZF6jilxsapbXGVfjhN8Fg=",
-               "WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18="
-             ],]]]
-  
-TrustKit.initializeWithConfiguration(config)
-```
+    let trustKitConfig = [
+       kTSKPinnedDomains: [
+           "yahoo.com": [
+               kTSKPublicKeyAlgorithms: [kTSKAlgorithmRsa2048],
+               kTSKPublicKeyHashes: [
+                   "JbQbUG5JMJUoI6brnx0x3vZF6jilxsapbXGVfjhN8Fg=",
+                   "WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18="
+                 ],]]]
+      
+    TrustKit.initializeWithConfiguration(config)
 
 Once **TrustKit** has been initialized, it will by default swizzle the App's _NSURLSession_ and _NSURLConnection_ delegates to verify the server's certificate against the configured pinning policy, whenever an HTTPS connection is initiated. If report URIs have been configured, the App will also send reports to the specified URIs whenever a pin validation failure occurred.
 
