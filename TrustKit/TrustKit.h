@@ -207,7 +207,7 @@ FOUNDATION_EXPORT const NSString * kTSKAlgorithmEcDsaSecp256r1;
  @exception NSException Thrown when the supplied configuration is invalid or TrustKit has already been initialized.
  
  */
-+ (void) initializeWithConfiguration:(NSDictionary *)trustKitConfig;
++ (void) initializeWithConfiguration:(NSDictionary *)trustKitConfig loggingEnabled:(BOOL)enabled;
 
 @end
 NS_ASSUME_NONNULL_END

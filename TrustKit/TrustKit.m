@@ -50,6 +50,9 @@ static NSDictionary *_trustKitGlobalConfiguration = nil;
 static BOOL _isTrustKitInitialized = NO;
 static dispatch_once_t dispatchOnceTrustKitInit;
 
+// Do we want to see logs?
+static BOOL _isLoggingEnabled = TRUE;
+
 // Reporter delegate for sending pin violation reports
 static TSKBackgroundReporter *_pinFailureReporter = nil;
 static char kTSKPinFailureReporterQueueLabel[] = "com.datatheorem.trustkit.reporterqueue";
@@ -65,6 +68,11 @@ static NSString * const kTSKDefaultReportUri = @"https://overmind.datatheorem.co
 
 void TSKLog(NSString *format, ...)
 {
+    // Only if enabled
+    if (!_isLoggingEnabled) {
+        return;
+    }
+    
     // Only log in debug builds
 #if DEBUG
     NSString *newFormat = [[NSString alloc] initWithFormat:@"=== TrustKit: %@", format];
@@ -208,7 +216,7 @@ NSDictionary *parseTrustKitArguments(NSDictionary *TrustKitArguments)
             domainFinalConfiguration[kTSKIncludeSubdomains] = shouldIncludeSubdomains;
         }
         
-
+        
         // Extract the optional enforcePinning setting
         NSNumber *shouldEnforcePinning = domainPinningPolicy[kTSKEnforcePinning];
         if (shouldEnforcePinning)
@@ -380,9 +388,10 @@ static void initializeTrustKit(NSDictionary *trustKitConfig)
 
 #pragma mark TrustKit Explicit Initialization
 
-+ (void) initializeWithConfiguration:(NSDictionary *)trustKitConfig
++ (void) initializeWithConfiguration:(NSDictionary *)trustKitConfig loggingEnabled:(BOOL)enabled
 {
     TSKLog(@"Configuration passed via explicit call to initializeWithConfiguration:");
+    _isLoggingEnabled = enabled;
     initializeTrustKit(trustKitConfig);
 }
 
