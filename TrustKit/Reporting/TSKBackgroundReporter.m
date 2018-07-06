@@ -121,7 +121,7 @@ static dispatch_once_t dispatchOnceBackgroundSession;
 #endif
                 {
                     // Device runs on iOS 8+ or OS X 10.10+ or min SDK is iOS 8+ or OS X 10.10+
-                    backgroundConfiguration = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier: [NSString stringWithFormat:kTSKBackgroundSessionIdentifierFormat, _appBundleId]];
+                    backgroundConfiguration = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier: [NSString stringWithFormat:kTSKBackgroundSessionIdentifierFormat, self->_appBundleId]];
                 }
 #endif
                 
@@ -184,7 +184,7 @@ static dispatch_once_t dispatchOnceBackgroundSession;
                                                         validatedCertificateChain:certificateChain
                                                                         knownPins:formattedPins
                                                                  validationResult:validationResult
-                                                                    appVendorId:_appVendorId];
+                                                                      appVendorId:_appVendorId];
     
     
     // Should we rate-limit this report?

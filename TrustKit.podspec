@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.authors      = 'Alban Diquet', 'Angela Chow', 'Eric Castro'
   s.source       = { :git => "https://github.com/datatheorem/TrustKit.git", :tag => "#{s.version}" }
-  s.ios.deployment_target = '7.0'
+  s.ios.deployment_target = '10.0'
   s.osx.deployment_target = '10.9'
   s.source_files = 'TrustKit', 'TrustKit/**/*.{h,m}'
   s.ios.exclude_files = 'TrustKit/Reporting/osx_vendor_id.{h,m}'
